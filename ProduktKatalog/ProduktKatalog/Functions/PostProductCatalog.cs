@@ -39,11 +39,11 @@ namespace ProductCatalog.Functions
             try
             {
                 product = JsonConvert.DeserializeObject<ProductModel>(requestBody);
+                log.LogInformation("Json parsed successfully.");
             }
-            catch (JsonSerializationException jse)
+            catch (Exception)
             {
-                log.LogError("", jse);
-                return new BadRequestObjectResult("Failed to deserialize Json object from request body");
+                return new BadRequestObjectResult("Failed to deserialize Json object from request body.");
             }
 
             return await StoreProductToTable(product, log);
@@ -52,6 +52,7 @@ namespace ProductCatalog.Functions
         private static async Task<IActionResult> StoreProductToTable(ProductModel product, ILogger log)
         {
             CloudTable table;
+            var tableName = "ProductTable";
 
             // Creates or connects to a Table
             try
@@ -63,12 +64,13 @@ namespace ProductCatalog.Functions
                 var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
                 // Creates a table client for interacting with the table service 
-                table = tableClient.GetTableReference("ProductTable");
+                table = tableClient.GetTableReference(tableName);
                 await table.CreateIfNotExistsAsync();
+                
+                log.LogInformation($"Connected to {table.Name}.");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                log.LogError(e, "Could not create or connect to the table.");
                 return new InternalServerErrorResult();
             }
 
@@ -81,7 +83,6 @@ namespace ProductCatalog.Functions
                 Description = product.Description
             };
 
-
             // Sends data to the Table
             try
             {
@@ -90,13 +91,15 @@ namespace ProductCatalog.Functions
 
                 // Executes the operation
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
+                
+                log.LogInformation($"Data added to {table.Name}.");
             }
-            catch (StorageException e)
+            catch (Exception)
             {
                 return new BadRequestObjectResult("Error during insert or merge operation.");
             }
 
-            return new OkObjectResult("Posted a new product to the table.");
+            return new OkObjectResult($"Posted a new product to the {table.Name}.");
         }
     }
 }
