@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ProduktKatalog.Functions
+namespace ProduktKatalog.Models
 {
     class ProductModel
     {

@@ -4,8 +4,10 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ProduktKatalog.Functions;
+using ProduktKatalog.Models;
+using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ProduktKatalog
@@ -21,7 +23,6 @@ namespace ProduktKatalog
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             
-
 
             return new OkObjectResult("");
         }
