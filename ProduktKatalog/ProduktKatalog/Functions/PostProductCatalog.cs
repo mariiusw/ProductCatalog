@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Collections.Generic;
-using ProduktKatalog.Models;
+using ProductCatalog.Models;
 
-namespace ProduktKatalog.Functions
+namespace ProductCatalog.Functions
 {
     public static class PostProductCatalog
     {
@@ -31,7 +31,31 @@ namespace ProduktKatalog.Functions
         {
             List<ProductModel> products = new List<ProductModel>();
 
+            string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+            if (string.IsNullOrEmpty(requestBody))
+            {
+                throw new System.ArgumentNullException("Request body was empty.");
+            }
 
+            ProductModel product = null;
+
+            try
+            {
+                product = JsonConvert.DeserializeObject<ProductModel>(requestBody);
+                products.Add(product);
+            }
+            catch (JsonSerializationException jse)
+            {
+
+                throw new JsonSerializationException("Failed to deserialize Json object from request body", jse);
+            }
+
+            await storeProductToTable(products, log);
+        }
+
+        private static Task storeProductToTable(List<ProductModel> products, ILogger log)
+        {
+            
         }
     }
 }
