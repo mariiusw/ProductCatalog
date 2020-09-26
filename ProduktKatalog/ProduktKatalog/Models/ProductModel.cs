@@ -1,14 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Azure.Cosmos.Table;
+using System;
 
 namespace ProductCatalog.Models
 {
-    class ProductModel
+    class ProductModel : TableEntity
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public double price { get; set; }
-        public string description { get; set; }
+        public ProductModel()
+        {
+        }
+
+        public ProductModel(int ProductId, DateTime currentDateTime)
+        {
+            PartitionKey = ProductId.ToString();
+            RowKey = currentDateTime.ToString();
+        }
+
+        public int ProductId { get; set; }
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public string Description { get; set; }
+        
+        
+        public class ProductModelExtended : ProductModel
+        {
+            public DateTime RowKeyDateTime => DateTime.Parse(RowKey);
+        }
     }
+
 }
