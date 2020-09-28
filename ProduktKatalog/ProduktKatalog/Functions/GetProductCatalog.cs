@@ -1,10 +1,15 @@
-using Microsoft.AspNetCore.Http;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using ProductCatalog.Models;
+using Microsoft.Azure.Cosmos.Table;
+using System.Web.Http;
+using System.Collections.Generic;
 
 namespace ProductCatalog
 {
@@ -18,14 +23,34 @@ namespace ProductCatalog
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            await MessageHandler(request, log);
-
-            return new OkObjectResult("");
+            return await MessageHandler(log);
         }
 
-        private static Task MessageHandler(HttpRequest request, ILogger log)
+        private static async Task<IActionResult> MessageHandler(ILogger log)
         {
-            throw new NotImplementedException();
+            CloudTable table;
+            var tableName = "producttable";
+
+            // Creates or connects to a Table
+            try
+            {
+                // Retrieve storage account information from connection string.
+                var storageAccount = CloudStorageAccount.Parse(@"UseDevelopmentStorage=true");
+
+                // Creates a table client for interacting with the table service
+                var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Creates a table client for interacting with the table service 
+                table = tableClient.GetTableReference(tableName);
+
+                log.LogInformation($"Connected to {table.Name}.");
+            }
+            catch (Exception)
+            {
+                return new InternalServerErrorResult();
+            }
+
+            return new OkObjectResult(result);
         }
     }
 }

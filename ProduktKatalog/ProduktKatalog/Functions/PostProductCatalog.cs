@@ -52,7 +52,7 @@ namespace ProductCatalog.Functions
         private static async Task<IActionResult> StoreProductToTable(ProductModel product, ILogger log)
         {
             CloudTable table;
-            var tableName = "ProductTable";
+            var tableName = "producttable";
 
             // Creates or connects to a Table
             try
