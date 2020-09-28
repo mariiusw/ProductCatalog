@@ -52,7 +52,6 @@ namespace ProductCatalog.Functions
         private static async Task<IActionResult> StoreProductToTable(ProductModel product, ILogger log)
         {
             CloudTable table;
-            var tableName = "producttable";
 
             // Creates or connects to a Table
             try
@@ -64,7 +63,7 @@ namespace ProductCatalog.Functions
                 var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
                 // Creates a table client for interacting with the table service 
-                table = tableClient.GetTableReference(tableName);
+                table = tableClient.GetTableReference("producttable");
                 await table.CreateIfNotExistsAsync();
                 
                 log.LogInformation($"Connected to {table.Name}.");

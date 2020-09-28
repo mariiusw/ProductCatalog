@@ -29,7 +29,7 @@ namespace ProductCatalog
         private static async Task<IActionResult> MessageHandler(ILogger log)
         {
             CloudTable table;
-            var tableName = "producttable";
+            List<ProductModel> entities = new List<ProductModel>();
 
             // Creates or connects to a Table
             try
@@ -41,7 +41,7 @@ namespace ProductCatalog
                 var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
                 // Creates a table client for interacting with the table service 
-                table = tableClient.GetTableReference(tableName);
+                table = tableClient.GetTableReference("producttable");
 
                 log.LogInformation($"Connected to {table.Name}.");
             }
@@ -50,6 +50,23 @@ namespace ProductCatalog
                 return new InternalServerErrorResult();
             }
 
+            // Gets products from Storage Table
+            TableContinuationToken token = null;
+            do
+            {
+                var queryResult = table.ExecuteQuerySegmented(new TableQuery<ProductModel>(), token);
+                entities.AddRange(queryResult.Results);
+                token = queryResult.ContinuationToken;
+            } while (token != null);
+            log.LogInformation($"Got {entities.Count} entries from from {table.Name}");
+
+            // Serialize a string with the products
+            var result = JsonConvert.SerializeObject(entities);
+
+            if (string.IsNullOrEmpty(result))
+            {
+                return new BadRequestResult();
+            }
             return new OkObjectResult(result);
         }
     }

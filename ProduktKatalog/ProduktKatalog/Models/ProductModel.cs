@@ -20,11 +20,9 @@ namespace ProductCatalog.Models
         public double Price { get; set; }
         public string Description { get; set; }
         
-        
         public class ProductModelExtended : ProductModel
         {
             public DateTime RowKeyDateTime => DateTime.Parse(RowKey);
         }
     }
-
 }
