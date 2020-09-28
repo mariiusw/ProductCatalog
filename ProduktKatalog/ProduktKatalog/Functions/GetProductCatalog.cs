@@ -61,7 +61,7 @@ namespace ProductCatalog
             log.LogInformation($"Got {entities.Count} entries from from {table.Name}");
 
             // Serialize a string with the products
-            var result = JsonConvert.SerializeObject(entities);
+            var result = JsonConvert.SerializeObject(entities, Formatting.Indented);
 
             if (string.IsNullOrEmpty(result))
             {
